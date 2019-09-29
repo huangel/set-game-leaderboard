@@ -53,21 +53,20 @@ class Game:
 			self.start_timer()
 			keyboard.press(Key.enter)
 			keyboard.release(Key.enter)		
-
 			self.end_game()
-			print("What is your name? ")
-			name = sys.stdin.readline()
-			# self.leaderboard.set_score(name, self.score)
+
+			self.instructions.end_of_game(self.score)
 			high_scores = self.leaderboard.get_high_score()
 
-			if self.score > self.high_score[1]:
+			if high_scores == (None, None):
+				self.instructions.new_high_score("No One :)", 0)
+			elif self.score > self.high_score[1]:
 				self.instructions.new_high_score(high_scores[0], high_scores[1])
 			else:
 				self.instructions.old_high_score(high_scores[0], high_scores[1])
 
-			self.main_thread_active = False
-			self.main_thread.join(1)
-
+			name = self.instructions.ask_for_name() 
+			self.leaderboard.set_score(name, self.score)
 			return
 			
 		elif start == "N":
@@ -79,30 +78,25 @@ class Game:
 			if menu == "Y":
 				self.start()
 			return
-
 		else: 
-			print("Please enter a valid choice.")
-			time.sleep(1)
+			self.instructions.enter_valid_choice()
 			self.start()
 
 	def start_timer(self):
 		self.timer_app = TimeApp(self.game_length, self)
 		self.timer_app.mainloop()
 
-	def end_game(self, natural = True):
-		high_scores = self.leaderboard.get_high_score()
+	def end_game(self):
+		self.main_thread_active = False
 		try:
 			self.timer_app.destroy()
 		except:
 			pass
-
-		if natural:
-			print('\nEnd of Game! Your score is', self.score)	
-		
+		self.main_thread.join(1)
 		
 	def main(self):
 		while self.main_thread_active:
-			self.display_cards()
+			self.instructions.display_game(self.current_cards, self.score)
 			if len(self.current_cards) < 3:
 				self.instructions.finish_game()
 				break
@@ -113,9 +107,6 @@ class Game:
 					if value.strip().upper() == 'A':
 						self.current_cards.extend(self.deck.get_cards(3))
 						continue
-					elif value.strip().upper() == "EXIT":
-						self.end_game(False)
-						return
 
 					else:
 						x, y, z = value.split()
@@ -146,21 +137,6 @@ class Game:
 
 				else:
 					self.instructions.wrong_set()
-
-
-	def display_cards(self):
-		"""
-		outputs to the user the cards in self.current_cards
-		"""
-		os.system('cls' if os.name == 'nt' else 'clear')
-		self.instructions.display_banner()
-		print('Score', self.score)
-		current = [str(i) for i in self.current_cards]
-		print('--------------')
-		for i in range(len(current)):
-			print('{:^{}}'.format(i, 4) + '* {:^{}} *'.format(current[i], 5))
-			print('--------------')
-
 
 	def is_set(self, x, y, z):
 		x = int(x)

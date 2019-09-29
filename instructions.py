@@ -42,6 +42,13 @@ class Instructions:
 		print('What three cards make a SET?')
 		return sys.stdin.readline()
 
+	def ask_for_name(self):
+		print("What is your name? ")
+		return sys.stdin.readline().strip()
+
+	def end_of_game(self, score):
+		print('\nEnd of Game! Your score is', score)
+
 	def wrong_input(self):
 		print("Please enter three integers (i.e. `2 4 5`) or `A` to add 3 cards")
 		time.sleep(1.5)
@@ -55,6 +62,23 @@ class Instructions:
 		sys.stdout.write("Sorry! That's not a SET.")
 		sys.stdout.flush()
 		time.sleep(1.5)
+
+	def enter_valid_choice(self):
+		print("Please enter a valid choice.")
+		time.sleep(1)
+
+	def display_game(self, cards, score):
+		"""
+		outputs to the user the cards in self.current_cards
+		"""
+		os.system('cls' if os.name == 'nt' else 'clear')
+		self.display_banner()
+		print('Score', score)
+		current = [str(i) for i in cards]
+		print('--------------')
+		for i in range(len(current)):
+			print('{:^{}}'.format(i, 4) + '* {:^{}} *'.format(current[i], 5))
+			print('--------------')
 
 	def display_leaderboard(self, scores):
 		ranks = len(str(len(scores)))

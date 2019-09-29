@@ -12,7 +12,6 @@ class Leaderboard():
 	def set_score(self, name, score):
 		with open(self.file, 'a') as f:
 			f.write(str(name) + "," + str(score) + "\n")
-
 		self._check_high_score(name, score)
 		self._insert_score_into_dic(name, score)
 
